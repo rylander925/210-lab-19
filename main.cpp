@@ -14,6 +14,38 @@ IDE Used: Visual Studio Code
 
  const int STREAM_IGNORE_CHARS = 100;
 
+ class Movie {
+    public:
+        //Constructors
+        Movie() { name = ""; head = nullptr; }
+        Movie(string name): name(name), head(nullptr) { }
+
+        //Full constructor; calls fillReviews function
+        Movie(string name, int reviews);
+
+        //Destructor
+        ~Movie() {
+            ReviewNode* current;
+            while(head) {
+                current = head;
+                head = head->next;
+                delete current;
+            }
+        }
+        //Getters and setters for the name
+        string GetName() const { return name; }
+        void SetName(string name) { this->name = name; }
+
+        //Only an accessor for the reviews
+        ReviewNode* GetReviews() const { return head; }
+
+        //Displays movie contents
+        void Print() const;
+    private:
+        string name;
+        ReviewNode* head;
+ };
+
  struct ReviewNode {
     string comment;
     double rating;
