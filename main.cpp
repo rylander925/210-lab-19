@@ -25,6 +25,8 @@ IDE Used: Visual Studio Code
     ReviewNode(string c, double r, ReviewNode* next): comment(c), rating(r), next(next) { }
  };
 
+void fillReviews(istream* input, ReviewNode* &head, int size);
+
 void push_front(ReviewNode* &head, double rating, string comment);
 
 void push_back(ReviewNode* &head, double rating, string comment);
@@ -172,4 +174,24 @@ T validateRange(istream* input, string datatype, T min, T max) {
         ss >> val;
     } while (ss.fail() || val < min || val > max);
     return val;
+}
+
+/**
+ * Fills a linked list of reviews, taking comments from an input stream, 
+ * and populating the rating with a random double from 0-5 (inclusive).
+ * @param input Input stream to take comments from
+ * @param head Head node of the linked list to populate
+ * @param size Number of reviews to add
+ */
+void fillReviews(istream* input, ReviewNode* &head, int size) {
+    static const int MIN_RATING = 0;
+    static const int MAX_RATING = 5;
+
+    string comment;
+    double rating;
+    for(int i = 0; i < size; i++) {
+        MIN_RATING + (rand() % (10 * MAX_RATING + 1)) / 10.0;
+        getline(*input, comment);
+        push_front(head, rating, comment);
+    } 
 }
