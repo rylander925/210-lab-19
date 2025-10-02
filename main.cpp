@@ -83,11 +83,14 @@ T validateRange(istream* input, string datatype, T min, T max);
 int main() {
     srand(20);
     const int REVIEWS = 3;
+    const int MOVIES = 4;
     const string REVIEWS_FILENAME = "reviews.txt";
     const string NAMES_FILENAME = "names.txt";
     istream* nameInput = &cin;
     ifstream nameFile;
     ifstream reviewInput;
+
+    MovieNode* head;
     
     //validate file open for reviews
     reviewInput.open(REVIEWS_FILENAME);
@@ -95,9 +98,10 @@ int main() {
         cout << "ERROR: Could not open file " << REVIEWS_FILENAME << endl;
         throw ios_base::failure("Invalid file name");
     }
+
+    head = new MovieNode("donald duck", &reviewInput, REVIEWS);
     
-    Movie movie("The Bee Movie", &reviewInput, 10);
-    movie.Print();
+    outputMovieList(head);
 }
 
 /**
@@ -133,7 +137,7 @@ void Movie::push_back(double rating, string comment) {
  * Outputs reveiws in a linked list followed by the average review
  */
 void Movie::outputReviews() const{
-    ReviewNode *current = head;
+    ReviewNode* current = head;
     int reviewNumber = 0; //keep track of # reviews while traversing
     double sum = 0;       //sum reviews to calculate average
 
@@ -148,6 +152,21 @@ void Movie::outputReviews() const{
         current = current->next;
     }
     cout << " > Average: " << sum / reviewNumber << endl;
+}
+
+/**
+ * Outputs linked list of movies
+ * @param head Head node of the linked list to output
+ */
+void outputMovieList(MovieNode* head) {
+    MovieNode* current = head;
+    int movieNumber = 0;
+    while(current) {
+        movieNumber++;
+        cout << "Movie #" << movieNumber << ": " << endl;
+        current->movie.Print();
+        current = current->next;
+    }
 }
 
 /**
@@ -203,10 +222,19 @@ void Movie::fillReviews(istream* input, int size) {
     } 
 }
 
+/**
+ * Fills a linked list of movies from input
+ * @param nameInput Movie names are retreived from this input stream
+ * @param reviewInput Reviews are retreived from this input stream
+ * @param head Head node of the linked list of movies
+ * @param size Length of the linked list of movies
+ * @param numReviews Number of reviews for each movie
+ */
 void fillMovieList(istream* nameInput, istream* reviewInput, MovieNode* &head, int size, int numReviews) {
     string name;
     MovieNode* newNode;
     for (int i = 0; i < size; i++) {
+        cout << "Enter movie name: ";
         getline(*nameInput, name);
         newNode = new MovieNode(name, reviewInput, numReviews);
         appendMovieNode(head, newNode);
