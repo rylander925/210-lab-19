@@ -13,33 +13,7 @@ IDE Used: Visual Studio Code
  using namespace std;
 
  const int STREAM_IGNORE_CHARS = 100;
-
- class Movie {
-    public:
-        //Constructors
-        Movie() { name = ""; head = nullptr; }
-        Movie(string name): name(name), head(nullptr) { }
-
-        //Full constructor; fills reviews from input
-        Movie(string name, istream* input, int reviews);
-
-        //Deletes all nodes of the reviews linked list
-        ~Movie();
-
-        //Getters and setters for the name
-        string GetName() const { return name; }
-        void SetName(string name) { this->name = name; }
-
-        //Only an accessor for the reviews
-        ReviewNode* GetReviews() const { return head; }
-
-        //Displays movie contents
-        void Print() const;
-    private:
-        string name;
-        ReviewNode* head;
- };
-
+ 
  struct ReviewNode {
     string comment;
     double rating;
@@ -51,13 +25,39 @@ IDE Used: Visual Studio Code
     ReviewNode(string c, double r, ReviewNode* next): comment(c), rating(r), next(next) { }
  };
 
-void fillReviews(istream* input, ReviewNode* &head, int size);
+ class Movie {
+    public:
+        //Constructors
+        Movie() { name = ""; head = nullptr; }
+        Movie(string name): name(name), head(nullptr) { }
+        Movie(string name, istream* input, int reviews);
 
-void push_front(ReviewNode* &head, double rating, string comment);
+        //Deltes nodes in linked list of reviews
+        ~Movie();
 
-void push_back(ReviewNode* &head, double rating, string comment);
+        //Getters and setters for the name
+        string GetName() const { return name; }
+        void SetName(string name) { this->name = name; }
 
-void outputReviews(ReviewNode* head);
+        //Only an accessor for the reviews
+        ReviewNode* GetReviews() const { return head; }
+
+        //Displays movie contents
+        void Print() const;
+        
+        void outputReviews() const;
+
+        void fillReviews(istream* input, int size);
+
+        void push_front(double rating, string comment);
+
+        void push_back(double rating, string comment);
+
+    private:
+        string name;
+        ReviewNode* head;
+ };
+
 
 template <typename T>
 T validateRange(istream* input, string datatype, T min, T max);
@@ -67,14 +67,7 @@ int main() {
     const string FILENAME = "data.txt";
     istream* input;
     ifstream infile;
-
-    string continueFlag = "";   //Whether or not user wants to quit
-
-    ReviewNode* head = nullptr; 
-
-    double rating;              //temp variables when taking input
-    string comment;
-
+    
     //Choose between file or console input
     if(FILENAME != "") {
         infile.open(FILENAME);
@@ -87,20 +80,17 @@ int main() {
     } else {
         input = &cin;
     }
-
-    //Take reviews from input while user continues
-    fillReviews(input, head, 40);
-
-    outputReviews(head);
+    
+    Movie movie("The Bee Movie", input, 10);
+    movie.Print();
 }
 
 /**
- * Prepends a new review node to the front of a linked list
- * @param head Head of the linked list to prepend to
+ * Prepends a new review node to the front of the reviews linked list
  * @param rating Rating of the new node
  * @param comment Comment of the new node
  */
-void push_front(ReviewNode* &head, double rating, string comment) {
+void Movie::push_front(double rating, string comment) {
     ReviewNode* newNode = new ReviewNode(comment, rating); //initialized w/ nullptr by default
     if (head) {
         newNode->next = head; //if list is not empty, only need to update next pointer
@@ -110,11 +100,10 @@ void push_front(ReviewNode* &head, double rating, string comment) {
 
 /**
  * Appends a new review node to the end of a linked list
- * @param head Head of the linked list to append to
  * @param rating Rating of the new node
  * @param comment Comment of the new node
  */
-void push_back(ReviewNode* &head, double rating, string comment) {
+void Movie::push_back(double rating, string comment) {
     ReviewNode* current = head;
     ReviewNode* newNode = new ReviewNode(comment, rating); //initialized w/ nullptr by default
     if (!head) { //head is the new node if empty
@@ -127,24 +116,23 @@ void push_back(ReviewNode* &head, double rating, string comment) {
 
 /**
  * Outputs reveiws in a linked list followed by the average review
- * @param head Head of the linked list of reviews
  */
-void outputReviews(ReviewNode* head) {
+void Movie::outputReviews() const{
     ReviewNode *current = head;
     int reviewNumber = 0; //keep track of # reviews while traversing
     double sum = 0;       //sum reviews to calculate average
 
     cout << fixed << setprecision(2);
-    cout << "Reviews:" << endl;
+    cout << " > Reviews:" << endl;
 
      //traverse list
     while (current) {
         reviewNumber++;
-        cout << "\t> Review #" << reviewNumber << ": " << current->rating << ": " << current->comment << endl;
+        cout << "\t#" << reviewNumber << ": " << current->rating << ": " << current->comment << endl;
         sum += current->rating;
         current = current->next;
     }
-    cout << "\t> Average: " << sum / reviewNumber << endl;
+    cout << " > Average: " << sum / reviewNumber << endl;
 }
 
 /**
@@ -187,7 +175,7 @@ T validateRange(istream* input, string datatype, T min, T max) {
  * @param head Head node of the linked list to populate
  * @param size Number of reviews to add
  */
-void fillReviews(istream* input, ReviewNode* &head, int size) {
+void Movie::fillReviews(istream* input, int size) {
     static const int MIN_RATING = 0;
     static const int MAX_RATING = 5;
 
@@ -196,7 +184,7 @@ void fillReviews(istream* input, ReviewNode* &head, int size) {
     for(int i = 0; i < size; i++) {
         rating = MIN_RATING + (rand() % (10 * MAX_RATING + 1)) / 10.0;
         getline(*input, comment);
-        push_front(head, rating, comment);
+        push_front(rating, comment);
     } 
 }
 
@@ -209,7 +197,7 @@ void fillReviews(istream* input, ReviewNode* &head, int size) {
 Movie::Movie(string name, istream* input, int reviews) {
     this->name = name;
     head = nullptr;
-    fillReviews(input, head, reviews);
+    fillReviews(input, reviews);
 }
 
 /**
@@ -217,7 +205,7 @@ Movie::Movie(string name, istream* input, int reviews) {
  */
 void Movie::Print() const{
     cout << "Title: " << name << endl;
-    outputReviews(head);
+    outputReviews();
 }
 
 /**
