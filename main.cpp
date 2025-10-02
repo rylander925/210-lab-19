@@ -74,7 +74,12 @@ void deleteMovieList(MovieNode* &head);
 
 void fillMovieList(istream* nameInput, istream* reviewInput, MovieNode* &head, int size, int numReviews);
 
+void fillMovieList(istream* nameInput, istream* badReviewInput, istream* goodReviewInput, 
+                    MovieNode* &head, int size, int numReviews);
+
 void outputMovieList(MovieNode* head);
+
+void validateFile(ifstream& infile, string filename);
 
 template <typename T>
 T validateRange(istream* input, string datatype, T min, T max);
@@ -93,24 +98,29 @@ int main() {
     MovieNode* head = nullptr;
     
     //validate file open for reviews and names (if used)
-    goodReviewFile.open(GOOD_REVIEWS_FILENAME);
-    if (!goodReviewFile.is_open()) {
-        cout << "ERROR: Could not open file " << GOOD_REVIEWS_FILENAME << endl;
-        throw ios_base::failure("Invalid file name");
-    }
-    badReviewFile.open(BAD_REVIEWS_FILENAME);
-    if (!badReviewFile.is_open()) {
-        cout << "ERROR: Could not open file " << BAD_REVIEWS_FILENAME << endl;
-        throw ios_base::failure("Invalid file name");
-    }
-    nameFile.open(NAMES_FILENAME);
-    if (!nameFile.is_open()) {
-        cout << "ERROR: Could not open file " << NAMES_FILENAME << endl;
-        throw ios_base::failure("Invalid file name");
-    }
+    validateFile(goodReviewFile, GOOD_REVIEWS_FILENAME);
+    validateFile(badReviewFile, BAD_REVIEWS_FILENAME);
+    validateFile(nameFile, NAMES_FILENAME);
 
     fillMovieList(&nameFile, &badReviewFile, head, MOVIES, REVIEWS);
     outputMovieList(head);
+
+    goodReviewFile.close();
+    badReviewFile.close();
+    nameFile.close();
+}
+
+/**
+ * Opens & validates input file stream
+ * @param infile Input file stream to open
+ * @param filename Name of the file to open
+ */
+void validateFile(ifstream& infile, string filename) {
+    infile.open(filename);
+    if (!infile.is_open()) {
+        cout << "ERROR: Could not open file " << filename << endl;
+        throw ios_base::failure("Invalid file name");
+    }
 }
 
 /**
