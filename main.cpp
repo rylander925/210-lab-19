@@ -24,6 +24,7 @@ IDE Used: Visual Studio Code
         Movie() { name = ""; head = nullptr; }
         Movie(string name): name(name), head(nullptr) { }
         Movie(string name, istream* input, int reviews);
+        Movie(string name, istream* badReviewInput, istream* goodReviewInput, int reviews);
 
         //Deltes nodes in linked list of reviews
         ~Movie();
@@ -39,6 +40,7 @@ IDE Used: Visual Studio Code
         //Helper functions for output and object instantiation
         void outputReviews() const;
         void fillReviews(istream* input, int size);
+        void fillReviews(istream* badReviewInput, istream* goodReviewInput, int size);
         void push_front(double rating, string comment);
         void push_back(double rating, string comment);
         void deleteReviews();
@@ -65,6 +67,8 @@ struct MovieNode {
     MovieNode() { next = nullptr; }
     //Instantiates with a full movie object
     MovieNode(string name, istream* input, int size) { movie = new Movie(name, input, size); next = nullptr; }
+    MovieNode(string name, istream* badReviewInput, istream* goodReviewInput, int size) 
+        { movie = new Movie(name, badReviewInput, goodReviewInput, size); next = nullptr; }
     ~MovieNode() { delete movie; }
 };
 
@@ -243,6 +247,26 @@ void Movie::fillReviews(istream* input, int size) {
 }
 
 /**
+ * Fills a linked list of reviews, taking comments from an input stream, 
+ * and populating the rating with a random double from 0-5 (inclusive).
+ * @param input Input stream to take comments from
+ * @param head Head node of the linked list to populate
+ * @param size Number of reviews to add
+ */
+void Movie::fillReviews(istream* input, int size) {
+    static const int MIN_RATING = 0;
+    static const int MAX_RATING = 5;
+
+    string comment;
+    double rating;
+    for(int i = 0; i < size; i++) {
+        rating = MIN_RATING + (rand() % (10 * MAX_RATING + 1)) / 10.0;
+        getline(*input, comment);
+        push_front(rating, comment);
+    } 
+}
+
+/**
  * Fills a linked list of movies from input
  * @param nameInput Movie names are retreived from this input stream
  * @param reviewInput Reviews are retreived from this input stream
@@ -257,6 +281,27 @@ void fillMovieList(istream* nameInput, istream* reviewInput, MovieNode* &head, i
         cout << "Enter movie name: " << endl;
         getline(*nameInput, name);                              //get name from input
         newNode = new MovieNode(name, reviewInput, numReviews); //Calls movie constructor when inputting reviews
+        appendMovieNode(head, newNode);
+    }
+}
+
+/**
+ * Fills a linked list of movies from input, with bad or good reviews depending on rating
+ * @param nameInput Movie names are retreived from this input stream
+ * @param badReviewInput Bad reviews are retreived from this input stream
+ * @param goodReviewInput Good reviews are retrieved from this input stream
+ * @param head Head node of the linked list of movies
+ * @param size Length of the linked list of movies
+ * @param numReviews Number of reviews for each movie
+ */
+void fillMovieList(istream* nameInput, istream* badReviewInput, istream* goodReviewInput, 
+                   MovieNode* &head, int size, int numReviews) {
+    string name;
+    MovieNode* newNode;
+    for (int i = 0; i < size; i++) {
+        cout << "Enter movie name: " << endl;
+        getline(*nameInput, name);                              //get name from input
+        newNode = new MovieNode(name, badReviewInput, goodReviewInput, numReviews); //Calls movie constructor when inputting reviews
         appendMovieNode(head, newNode);
     }
 }
