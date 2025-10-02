@@ -80,30 +80,36 @@ template <typename T>
 T validateRange(istream* input, string datatype, T min, T max);
 
 int main() {
-    srand(20);
+    srand(time(0));
     const int REVIEWS = 5;
     const int MOVIES = 5;
-    const string REVIEWS_FILENAME = "reviews.txt";
+    const string BAD_REVIEWS_FILENAME = "badreviews.txt";
+    const string GOOD_REVIEWS_FILENAME = "goodreviews.txt";
     const string NAMES_FILENAME = "names.txt";
     ifstream nameFile;
-    ifstream reviewInput;
+    ifstream badReviewFile;
+    ifstream goodReviewFile;
 
     MovieNode* head = nullptr;
     
     //validate file open for reviews and names (if used)
-    reviewInput.open(REVIEWS_FILENAME);
-    if (!reviewInput.is_open()) {
-        cout << "ERROR: Could not open file " << REVIEWS_FILENAME << endl;
+    goodReviewFile.open(GOOD_REVIEWS_FILENAME);
+    if (!goodReviewFile.is_open()) {
+        cout << "ERROR: Could not open file " << GOOD_REVIEWS_FILENAME << endl;
         throw ios_base::failure("Invalid file name");
     }
-
+    badReviewFile.open(BAD_REVIEWS_FILENAME);
+    if (!badReviewFile.is_open()) {
+        cout << "ERROR: Could not open file " << BAD_REVIEWS_FILENAME << endl;
+        throw ios_base::failure("Invalid file name");
+    }
     nameFile.open(NAMES_FILENAME);
-    if (!reviewInput.is_open()) {
+    if (!nameFile.is_open()) {
         cout << "ERROR: Could not open file " << NAMES_FILENAME << endl;
         throw ios_base::failure("Invalid file name");
     }
 
-    fillMovieList(&nameFile, &reviewInput, head, MOVIES, REVIEWS);
+    fillMovieList(&nameFile, &badReviewFile, head, MOVIES, REVIEWS);
     outputMovieList(head);
 }
 
