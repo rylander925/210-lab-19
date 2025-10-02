@@ -24,6 +24,11 @@ IDE Used: Visual Studio Code
         Movie() { name = ""; head = nullptr; }
         Movie(string name): name(name), head(nullptr) { }
         Movie(string name, istream* input, int reviews);
+        Movie(const Movie& movie) {
+            name = movie.name;
+            deleteReviews();
+
+        }
 
         //Deltes nodes in linked list of reviews
         ~Movie();
@@ -44,6 +49,7 @@ IDE Used: Visual Studio Code
         void fillReviews(istream* input, int size);
         void push_front(double rating, string comment);
         void push_back(double rating, string comment);
+        void deleteReviews();
 
         string name;
         ReviewNode* head;
@@ -99,9 +105,12 @@ int main() {
         throw ios_base::failure("Invalid file name");
     }
 
-    head = new MovieNode("donald duck", &reviewInput, REVIEWS);
+    Movie movie("Name", &reviewInput, 20);
+    movie.Print();
+
+    //head = new MovieNode("donald duck", &reviewInput, REVIEWS);
     
-    outputMovieList(head);
+    //outputMovieList(head);
 }
 
 /**
@@ -265,12 +274,20 @@ void Movie::Print() const{
  * Deletes all nodes in the linked list of reviews
  */
 Movie::~Movie() {
+    deleteReviews();
+}
+
+/**
+ * Delete linked list of reviews stored
+ */
+void Movie::deleteReviews() {
     ReviewNode* current;
     while (head) {
         current = head;
         head = head->next;
         delete current;
     }
+    head = nullptr;
 }
 
 /**
@@ -295,4 +312,5 @@ void deleteMovieList(MovieNode* &head) {
         head = head->next;
         delete current;
     }
+    head = nullptr;
 }
