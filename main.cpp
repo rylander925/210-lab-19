@@ -32,21 +32,19 @@ IDE Used: Visual Studio Code
         string GetName() const { return name; }
         void SetName(string name) { this->name = name; }
 
-        //Only an accessor for the reviews
+        //Only an accessor for the reviews pointer
         ReviewNode* GetReviews() const { return head; }
 
         //Displays movie contents
         void Print() const;
-        
-        void outputReviews() const;
-
-        void fillReviews(istream* input, int size);
-
-        void push_front(double rating, string comment);
-
-        void push_back(double rating, string comment);
 
     private:
+        //Helper functions for output and object instantiation
+        void outputReviews() const;
+        void fillReviews(istream* input, int size);
+        void push_front(double rating, string comment);
+        void push_back(double rating, string comment);
+
         string name;
         ReviewNode* head;
  };
@@ -71,29 +69,25 @@ struct MovieNode {
     MovieNode(string name, istream* input, int size) { movie = Movie(name, input, size); next = nullptr; }
 };
 
+void appendMovieNode(MovieNode* &head, MovieNode* &newNode);
+
 template <typename T>
 T validateRange(istream* input, string datatype, T min, T max);
 
 int main() {
     srand(20);
-    const string FILENAME = "data.txt";
-    istream* input;
-    ifstream infile;
+    const string REVIEWS_FILENAME = "data.txt";
+    istream* nameInput;
+    ifstream reviewInput;
     
-    //Choose between file or console input
-    if(FILENAME != "") {
-        infile.open(FILENAME);
-        //validate file open
-        if (!infile.is_open()) {
-            cout << "ERROR: Could not open file " << FILENAME << endl;
-            throw ios_base::failure("Invalid file name");
-        }
-        input = &infile;
-    } else {
-        input = &cin;
+    //validate file open
+    reviewInput.open(REVIEWS_FILENAME);
+    if (!reviewInput.is_open()) {
+        cout << "ERROR: Could not open file " << REVIEWS_FILENAME << endl;
+        throw ios_base::failure("Invalid file name");
     }
     
-    Movie movie("The Bee Movie", input, 10);
+    Movie movie("The Bee Movie", &reviewInput, 10);
     movie.Print();
 }
 
@@ -230,4 +224,16 @@ Movie::~Movie() {
         head = head->next;
         delete current;
     }
+}
+
+/**
+ * Appends a given MovieNode to a linked list of movies
+ * @param head Head node of the linked list
+ * @param newNode Instantiated MovieNode to append
+ */
+void appendMovieNode(MovieNode* &head, MovieNode* &newNode) {
+    if (head) {
+        newNode->next = head;
+    }
+    head = newNode;
 }
