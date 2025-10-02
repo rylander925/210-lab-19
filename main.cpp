@@ -20,18 +20,12 @@ IDE Used: Visual Studio Code
         Movie() { name = ""; head = nullptr; }
         Movie(string name): name(name), head(nullptr) { }
 
-        //Full constructor; calls fillReviews function
-        Movie(string name, int reviews);
+        //Full constructor; fills reviews from input
+        Movie(string name, istream* input, int reviews);
 
-        //Destructor
-        ~Movie() {
-            ReviewNode* current;
-            while(head) {
-                current = head;
-                head = head->next;
-                delete current;
-            }
-        }
+        //Deletes all nodes of the reviews linked list
+        ~Movie();
+
         //Getters and setters for the name
         string GetName() const { return name; }
         void SetName(string name) { this->name = name; }
@@ -141,7 +135,7 @@ void outputReviews(ReviewNode* head) {
     double sum = 0;       //sum reviews to calculate average
 
     cout << fixed << setprecision(2);
-    cout << "Outputting all reviews:" << endl;
+    cout << "Reviews:" << endl;
 
      //traverse list
     while (current) {
@@ -204,4 +198,36 @@ void fillReviews(istream* input, ReviewNode* &head, int size) {
         getline(*input, comment);
         push_front(head, rating, comment);
     } 
+}
+
+/**
+ * Instantiates a movie object and populates it with reviews from input
+ * @param name Name of the movie
+ * @param input Retrieves review comments from input stream
+ * @param reviews Number of reviews to add
+*/
+Movie::Movie(string name, istream* input, int reviews) {
+    this->name = name;
+    head = nullptr;
+    fillReviews(input, head, reviews);
+}
+
+/**
+ * Outputs to console movie title and reviews
+ */
+void Movie::Print() const{
+    cout << "Title: " << name << endl;
+    outputReviews(head);
+}
+
+/**
+ * Deletes all nodes in the linked list of reviews
+ */
+Movie::~Movie() {
+    ReviewNode* current;
+    while (head) {
+        current = head;
+        head = head->next;
+        delete current;
+    }
 }
