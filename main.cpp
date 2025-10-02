@@ -103,10 +103,8 @@ int main() {
         cout << "ERROR: Could not open file " << NAMES_FILENAME << endl;
         throw ios_base::failure("Invalid file name");
     }
-    fillMovieList(&nameFile, &reviewInput, head, MOVIES, REVIEWS);
 
-    //head = new MovieNode("donald duck", &reviewInput, REVIEWS);
-    
+    fillMovieList(&nameFile, &reviewInput, head, MOVIES, REVIEWS);
     outputMovieList(head);
 }
 
@@ -167,6 +165,7 @@ void Movie::outputReviews() const{
 void outputMovieList(MovieNode* head) {
     MovieNode* current = head;
     int movieNumber = 0;
+    //treverse list; use movie print function for output
     while(current) {
         movieNumber++;
         cout << "Movie #" << movieNumber << ": " << endl;
@@ -241,8 +240,8 @@ void fillMovieList(istream* nameInput, istream* reviewInput, MovieNode* &head, i
     MovieNode* newNode;
     for (int i = 0; i < size; i++) {
         cout << "Enter movie name: " << endl;
-        getline(*nameInput, name);
-        newNode = new MovieNode(name, reviewInput, numReviews);
+        getline(*nameInput, name);                              //get name from input
+        newNode = new MovieNode(name, reviewInput, numReviews); //Calls movie constructor when inputting reviews
         appendMovieNode(head, newNode);
     }
 }
@@ -279,6 +278,7 @@ Movie::~Movie() {
  */
 void Movie::deleteReviews() {
     ReviewNode* current;
+    //traverse & delete pointers
     while (head) {
         current = head;
         head = head->next;
@@ -304,6 +304,7 @@ void appendMovieNode(MovieNode* &head, MovieNode* &newNode) {
  */
 void deleteMovieList(MovieNode* &head) {
     MovieNode* current;
+    //treaverse & delete pointers
     while(head) {
         current = head;
         head = head->next;
