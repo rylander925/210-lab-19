@@ -71,16 +71,25 @@ struct MovieNode {
 
 void appendMovieNode(MovieNode* &head, MovieNode* &newNode);
 
+void deleteMovieList(MovieNode* &head);
+
+void fillMovieList(istream* nameInput, istream* reviewInput, MovieNode* &head, int size, int numReviews);
+
+void outputMovieList(MovieNode* head);
+
 template <typename T>
 T validateRange(istream* input, string datatype, T min, T max);
 
 int main() {
     srand(20);
-    const string REVIEWS_FILENAME = "data.txt";
-    istream* nameInput;
+    const int REVIEWS = 3;
+    const string REVIEWS_FILENAME = "reviews.txt";
+    const string NAMES_FILENAME = "names.txt";
+    istream* nameInput = &cin;
+    ifstream nameFile;
     ifstream reviewInput;
     
-    //validate file open
+    //validate file open for reviews
     reviewInput.open(REVIEWS_FILENAME);
     if (!reviewInput.is_open()) {
         cout << "ERROR: Could not open file " << REVIEWS_FILENAME << endl;
@@ -194,6 +203,16 @@ void Movie::fillReviews(istream* input, int size) {
     } 
 }
 
+void fillMovieList(istream* nameInput, istream* reviewInput, MovieNode* &head, int size, int numReviews) {
+    string name;
+    MovieNode* newNode;
+    for (int i = 0; i < size; i++) {
+        getline(*nameInput, name);
+        newNode = new MovieNode(name, reviewInput, numReviews);
+        appendMovieNode(head, newNode);
+    }
+}
+
 /**
  * Instantiates a movie object and populates it with reviews from input
  * @param name Name of the movie
@@ -236,4 +255,16 @@ void appendMovieNode(MovieNode* &head, MovieNode* &newNode) {
         newNode->next = head;
     }
     head = newNode;
+}
+
+/**
+ * Deletes nodes of given linked list of movies
+ */
+void deleteMovieList(MovieNode* &head) {
+    MovieNode* current;
+    while(head) {
+        current = head;
+        head = head->next;
+        delete current;
+    }
 }
