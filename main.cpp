@@ -82,14 +82,14 @@ T validateRange(istream* input, string datatype, T min, T max);
 int main() {
     srand(20);
     const int REVIEWS = 3;
-    const int MOVIES = 4;
+    const int MOVIES = 5;
     const string REVIEWS_FILENAME = "reviews.txt";
     const string NAMES_FILENAME = "names.txt";
     istream* nameInput = &cin;
     ifstream nameFile;
     ifstream reviewInput;
 
-    MovieNode* head;
+    MovieNode* head = nullptr;
     
     //validate file open for reviews
     reviewInput.open(REVIEWS_FILENAME);
@@ -97,7 +97,13 @@ int main() {
         cout << "ERROR: Could not open file " << REVIEWS_FILENAME << endl;
         throw ios_base::failure("Invalid file name");
     }
-    fillMovieList(nameInput, &reviewInput, head, MOVIES, REVIEWS);
+
+    nameFile.open(NAMES_FILENAME);
+    if (!reviewInput.is_open()) {
+        cout << "ERROR: Could not open file " << NAMES_FILENAME << endl;
+        throw ios_base::failure("Invalid file name");
+    }
+    fillMovieList(&nameFile, &reviewInput, head, MOVIES, REVIEWS);
 
     //head = new MovieNode("donald duck", &reviewInput, REVIEWS);
     
@@ -234,7 +240,7 @@ void fillMovieList(istream* nameInput, istream* reviewInput, MovieNode* &head, i
     string name;
     MovieNode* newNode;
     for (int i = 0; i < size; i++) {
-        cout << "Enter movie name: ";
+        cout << "Enter movie name: " << endl;
         getline(*nameInput, name);
         newNode = new MovieNode(name, reviewInput, numReviews);
         appendMovieNode(head, newNode);
