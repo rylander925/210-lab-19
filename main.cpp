@@ -14,16 +14,9 @@ IDE Used: Visual Studio Code
 
  const int STREAM_IGNORE_CHARS = 100;
  
- struct ReviewNode {
-    string comment;
-    double rating;
-    ReviewNode* next;
-
-    //constructors; by default next is initialized with nullptr
-    ReviewNode() { comment = "No comment"; rating = -1; next = nullptr; }
-    ReviewNode(string c, double r): comment(c), rating(r), next(nullptr) { }
-    ReviewNode(string c, double r, ReviewNode* next): comment(c), rating(r), next(next) { }
- };
+ struct ReviewNode;
+ class Movie;
+ struct MovieNode;
 
  class Movie {
     public:
@@ -58,6 +51,25 @@ IDE Used: Visual Studio Code
         ReviewNode* head;
  };
 
+ struct ReviewNode {
+    string comment;
+    double rating;
+    ReviewNode* next;
+
+    //constructors; by default next is initialized with nullptr
+    ReviewNode() { comment = "No comment"; rating = -1; next = nullptr; }
+    ReviewNode(string c, double r): comment(c), rating(r), next(nullptr) { }
+    ReviewNode(string c, double r, ReviewNode* next): comment(c), rating(r), next(next) { }
+ };
+
+struct MovieNode {
+    MovieNode* next;
+    Movie movie;
+
+    MovieNode() { next = nullptr; }
+    //Instantiates with a full movie object
+    MovieNode(string name, istream* input, int size) { movie = Movie(name, input, size); next = nullptr; }
+};
 
 template <typename T>
 T validateRange(istream* input, string datatype, T min, T max);
