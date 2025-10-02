@@ -24,20 +24,12 @@ IDE Used: Visual Studio Code
         Movie() { name = ""; head = nullptr; }
         Movie(string name): name(name), head(nullptr) { }
         Movie(string name, istream* input, int reviews);
-        Movie(const Movie& movie) {
-            name = movie.name;
-            deleteReviews();
-
-        }
 
         //Deltes nodes in linked list of reviews
         ~Movie();
 
-        //Getters and setters for the name
+        //Getters
         string GetName() const { return name; }
-        void SetName(string name) { this->name = name; }
-
-        //Only an accessor for the reviews pointer
         ReviewNode* GetReviews() const { return head; }
 
         //Displays movie contents
@@ -68,11 +60,12 @@ IDE Used: Visual Studio Code
 
 struct MovieNode {
     MovieNode* next;
-    Movie movie;
+    Movie* movie;
 
     MovieNode() { next = nullptr; }
     //Instantiates with a full movie object
-    MovieNode(string name, istream* input, int size) { movie = Movie(name, input, size); next = nullptr; }
+    MovieNode(string name, istream* input, int size) { movie = new Movie(name, input, size); next = nullptr; }
+    ~MovieNode() { delete movie; }
 };
 
 void appendMovieNode(MovieNode* &head, MovieNode* &newNode);
@@ -104,13 +97,11 @@ int main() {
         cout << "ERROR: Could not open file " << REVIEWS_FILENAME << endl;
         throw ios_base::failure("Invalid file name");
     }
-
-    Movie movie("Name", &reviewInput, 20);
-    movie.Print();
+    fillMovieList(nameInput, &reviewInput, head, MOVIES, REVIEWS);
 
     //head = new MovieNode("donald duck", &reviewInput, REVIEWS);
     
-    //outputMovieList(head);
+    outputMovieList(head);
 }
 
 /**
@@ -173,7 +164,7 @@ void outputMovieList(MovieNode* head) {
     while(current) {
         movieNumber++;
         cout << "Movie #" << movieNumber << ": " << endl;
-        current->movie.Print();
+        current->movie->Print();
         current = current->next;
     }
 }
