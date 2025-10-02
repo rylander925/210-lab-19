@@ -81,17 +81,16 @@ T validateRange(istream* input, string datatype, T min, T max);
 
 int main() {
     srand(20);
-    const int REVIEWS = 3;
+    const int REVIEWS = 5;
     const int MOVIES = 5;
     const string REVIEWS_FILENAME = "reviews.txt";
     const string NAMES_FILENAME = "names.txt";
-    istream* nameInput = &cin;
     ifstream nameFile;
     ifstream reviewInput;
 
     MovieNode* head = nullptr;
     
-    //validate file open for reviews
+    //validate file open for reviews and names (if used)
     reviewInput.open(REVIEWS_FILENAME);
     if (!reviewInput.is_open()) {
         cout << "ERROR: Could not open file " << REVIEWS_FILENAME << endl;
