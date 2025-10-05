@@ -89,7 +89,7 @@ template <typename T>
 T validateRange(istream* input, string datatype, T min, T max);
 
 int main() {
-    srand(time(0));
+    srand(time(0)); //seed random number for ratings
     const int REVIEWS = 5;
     const int MOVIES = 5;
     const string BAD_REVIEWS_FILENAME = "badreviews.txt";
@@ -106,8 +106,11 @@ int main() {
     validateFile(badReviewFile, BAD_REVIEWS_FILENAME);
     validateFile(nameFile, NAMES_FILENAME);
 
-    fillMovieList(&nameFile, &badReviewFile, head, MOVIES, REVIEWS);
+    //Populate and output review data
+    fillMovieList(&nameFile, &badReviewFile, &goodReviewFile, head, MOVIES, REVIEWS);
     outputMovieList(head);
+
+    deleteMovieList(head);
 
     goodReviewFile.close();
     badReviewFile.close();
@@ -249,19 +252,23 @@ void Movie::fillReviews(istream* input, int size) {
 /**
  * Fills a linked list of reviews, taking comments from an input stream, 
  * and populating the rating with a random double from 0-5 (inclusive).
- * @param input Input stream to take comments from
+ * Chooses good or bad reviews based on rating.
+ * @param badReviewInput Input stream to retrieve bad reviews from
+ * @param goodReviewInput Input stream to retrieve good reviews from
  * @param head Head node of the linked list to populate
  * @param size Number of reviews to add
  */
-void Movie::fillReviews(istream* input, int size) {
+void Movie::fillReviews(istream* badReviewInput, istream* goodReviewInput, int size) {
     static const int MIN_RATING = 0;
     static const int MAX_RATING = 5;
+    static const int GOOD_REVIEW_LIMIT = 4;
 
     string comment;
     double rating;
     for(int i = 0; i < size; i++) {
         rating = MIN_RATING + (rand() % (10 * MAX_RATING + 1)) / 10.0;
-        getline(*input, comment);
+        //Use bad review if rating is below the good review limit
+        getline(*(rating < GOOD_REVIEW_LIMIT ? badReviewInput : goodReviewInput), comment);
         push_front(rating, comment);
     } 
 }
@@ -316,6 +323,19 @@ Movie::Movie(string name, istream* input, int reviews) {
     this->name = name;
     head = nullptr;
     fillReviews(input, reviews);
+}
+
+/**
+ * Instantiates a movie object and populates it with reviews from input, choosing between good or bad reviews based on rating
+ * @param name Name of the movie
+ * @param badReviewInput Input stream to retrieve bad reviews from
+ * @param goodReviewInput Input stream to retrieve good reviews from
+ * @param reviews Number of reviews to add
+*/
+Movie::Movie(string name, istream* badReviewInput, istream* goodReviewInput, int reviews) {
+    this->name = name;
+    head = nullptr;
+    fillReviews(badReviewInput, goodReviewInput, reviews);
 }
 
 /**
