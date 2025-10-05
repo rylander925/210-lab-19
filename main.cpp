@@ -10,15 +10,15 @@ IDE Used: Visual Studio Code
 #include <istream>
 #include <sstream>
 
- using namespace std;
+using namespace std;
 
- const int STREAM_IGNORE_CHARS = 100;
+const int STREAM_IGNORE_CHARS = 100;
  
- struct ReviewNode;
- class Movie;
- struct MovieNode;
+struct ReviewNode;
+class Movie;
+struct MovieNode;
 
- class Movie {
+class Movie {
     public:
         //Constructors
         Movie() { name = ""; head = nullptr; }
@@ -26,12 +26,8 @@ IDE Used: Visual Studio Code
         Movie(string name, istream* input, int reviews);
         Movie(string name, istream* badReviewInput, istream* goodReviewInput, int reviews);
 
-        //Deltes nodes in linked list of reviews
+        //Deletes nodes in linked list of reviews
         ~Movie();
-
-        //Getters
-        string GetName() const { return name; }
-        ReviewNode* GetReviews() const { return head; }
 
         //Displays movie contents
         void Print() const;
@@ -49,7 +45,7 @@ IDE Used: Visual Studio Code
         ReviewNode* head;
  };
 
- struct ReviewNode {
+struct ReviewNode {
     string comment;
     double rating;
     ReviewNode* next;
@@ -67,12 +63,15 @@ struct MovieNode {
     MovieNode() { next = nullptr; }
     //Instantiates with a full movie object
     MovieNode(string name, istream* input, int size) { movie = new Movie(name, input, size); next = nullptr; }
+    
+    //Full constructor with added bad review/good review functionality
     MovieNode(string name, istream* badReviewInput, istream* goodReviewInput, int size) 
         { movie = new Movie(name, badReviewInput, goodReviewInput, size); next = nullptr; }
+
     ~MovieNode() { delete movie; }
 };
 
-void appendMovieNode(MovieNode* &head, MovieNode* &newNode);
+void prependMovieNode(MovieNode* &head, MovieNode* &newNode);
 
 void deleteMovieList(MovieNode* &head);
 
@@ -115,6 +114,8 @@ int main() {
     goodReviewFile.close();
     badReviewFile.close();
     nameFile.close();
+
+    cout << "Reviews and names generated with ChatGPT" << endl;
 }
 
 /**
@@ -187,7 +188,7 @@ void Movie::outputReviews() const{
 void outputMovieList(MovieNode* head) {
     MovieNode* current = head;
     int movieNumber = 0;
-    //treverse list; use movie print function for output
+    //traverse list; use movie print function for output
     while(current) {
         movieNumber++;
         cout << "Movie #" << movieNumber << ": " << endl;
@@ -242,7 +243,9 @@ void Movie::fillReviews(istream* input, int size) {
 
     string comment;
     double rating;
+    //Populates reviews with a random rating and a review from input
     for(int i = 0; i < size; i++) {
+        //sets random rating between MIN_RATING & MAX_RATING inclusive
         rating = MIN_RATING + (rand() % (10 * MAX_RATING + 1)) / 10.0;
         getline(*input, comment);
         push_front(rating, comment);
@@ -265,7 +268,9 @@ void Movie::fillReviews(istream* badReviewInput, istream* goodReviewInput, int s
 
     string comment;
     double rating;
+    //Populates reviews with a random rating and a review from input
     for(int i = 0; i < size; i++) {
+        //sets random rating between MIN_RATING & MAX_RATING inclusive
         rating = MIN_RATING + (rand() % (10 * MAX_RATING + 1)) / 10.0;
         //Use bad review if rating is below the good review limit
         getline(*(rating < GOOD_REVIEW_LIMIT ? badReviewInput : goodReviewInput), comment);
@@ -284,11 +289,12 @@ void Movie::fillReviews(istream* badReviewInput, istream* goodReviewInput, int s
 void fillMovieList(istream* nameInput, istream* reviewInput, MovieNode* &head, int size, int numReviews) {
     string name;
     MovieNode* newNode;
+    //Fills movie nodes with names from input. Calls Movie constructor to populate reviews
     for (int i = 0; i < size; i++) {
         cout << "Enter movie name: " << endl;
         getline(*nameInput, name);                              //get name from input
         newNode = new MovieNode(name, reviewInput, numReviews); //Calls movie constructor when inputting reviews
-        appendMovieNode(head, newNode);
+        prependMovieNode(head, newNode);
     }
 }
 
@@ -305,11 +311,12 @@ void fillMovieList(istream* nameInput, istream* badReviewInput, istream* goodRev
                    MovieNode* &head, int size, int numReviews) {
     string name;
     MovieNode* newNode;
+    //Fills movie nodes with names from input. Calls Movie constructor to populate reviews
     for (int i = 0; i < size; i++) {
         cout << "Enter movie name: " << endl;
-        getline(*nameInput, name);                              //get name from input
+        getline(*nameInput, name);                                                  //get name from input
         newNode = new MovieNode(name, badReviewInput, goodReviewInput, numReviews); //Calls movie constructor when inputting reviews
-        appendMovieNode(head, newNode);
+        prependMovieNode(head, newNode);
     }
 }
 
@@ -368,11 +375,11 @@ void Movie::deleteReviews() {
 }
 
 /**
- * Appends a given MovieNode to a linked list of movies
+ * Prepends a given MovieNode to the front of a linked list of movies
  * @param head Head node of the linked list
  * @param newNode Instantiated MovieNode to append
  */
-void appendMovieNode(MovieNode* &head, MovieNode* &newNode) {
+void prependMovieNode(MovieNode* &head, MovieNode* &newNode) {
     if (head) {
         newNode->next = head;
     }
